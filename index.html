@@ -346,24 +346,35 @@
     position:absolute;
     bottom:18px; left:18px;
     z-index:1000;
-    max-width:280px;
+    max-width:380px;
     background:rgba(11,34,48,0.78);
     backdrop-filter:blur(6px);
     border:1px solid rgba(231,241,240,0.08);
-    border-radius:12px;
-    padding:14px 16px;
+    border-radius:10px;
+    padding:10px 16px;
     font-size:12px;
     color:var(--ice-dim);
-    line-height:1.5;
+    line-height:1.4;
     pointer-events:none;
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    column-gap:8px;
   }
   .intro-card strong{
     color:var(--ice);
     font-family:var(--font-display);
-    display:block;
     font-size:13px;
-    margin-bottom:4px;
     letter-spacing:0.03em;
+    flex-shrink:0;
+  }
+
+  @media (max-width: 767px){
+    .intro-card{
+      right:18px;
+      left:18px;
+      max-width:none;
+    }
   }
 
   /* ---------- DESKTOP LAYOUT ---------- */
@@ -448,13 +459,21 @@
   // ------------------------------------------------------------
   // Default view: Pond Inlet (Mittimatalik) & Bylot Island,
   // looking across Tasiujaq / Eclipse Sound.
+  //
+  // On narrow (mobile) viewports the same zoom level shows a much
+  // smaller geographic area than on a wide desktop screen, so we
+  // start one zoom level out on phones to keep both camera sites
+  // comfortably in view.
   // ============================================================
+  const isMobile = window.innerWidth < 768;
+  const defaultZoom = isMobile ? 9 : 10;
+
   const map = L.map('map', {
     zoomControl: true,
     attributionControl: true,
     minZoom: 6,
     maxZoom: 18
-  }).setView([72.85, -77.75], 10);
+  }).setView([72.79, -77.75], defaultZoom);
 
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics',
