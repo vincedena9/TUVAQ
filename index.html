@@ -123,24 +123,25 @@
 
   /* ---------- SITE MARKER ---------- */
   .cam-marker{
-    width:34px; height:34px;
+    --marker-color: var(--signal);
+    width:44px; height:44px;
     display:flex; align-items:center; justify-content:center;
     position:relative;
   }
   .cam-marker .ring{
     position:absolute;
-    width:34px; height:34px;
+    width:44px; height:44px;
     border-radius:50%;
-    border:1.5px solid var(--signal);
+    border:2px solid var(--marker-color);
     opacity:0.65;
     animation:ping 2.4s ease-out infinite;
   }
   .cam-marker .core{
-    width:14px; height:14px;
+    width:19px; height:19px;
     border-radius:50%;
-    background:var(--signal);
-    box-shadow:0 0 10px var(--signal), 0 0 2px rgba(0,0,0,0.4) inset;
-    border:2px solid rgba(6,20,31,0.9);
+    background:var(--marker-color);
+    box-shadow:0 0 12px var(--marker-color), 0 0 2px rgba(0,0,0,0.4) inset;
+    border:2.5px solid rgba(6,20,31,0.9);
     transition:transform 0.15s ease;
     z-index:1;
   }
@@ -156,31 +157,22 @@
 
   .cam-label{
     white-space:nowrap;
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:0.04em;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:0.03em;
     color:var(--ice);
     background:rgba(6,20,31,0.78);
-    padding:3px 9px;
-    border-radius:5px;
+    padding:5px 12px;
+    border-radius:6px;
     border:1px solid rgba(231,241,240,0.1);
     pointer-events:none;
     backdrop-filter:blur(4px);
   }
 
   /* ---------- FOV SECTOR ---------- */
-  .fov-sector{
-    fill:rgba(255,140,77,0.16);
-    stroke:rgba(255,140,77,0.55);
-    stroke-width:2px;
-    stroke-linejoin:round;
-    cursor:pointer;
-    transition:fill 0.15s ease, stroke 0.15s ease;
-  }
-  .fov-sector:hover, .fov-sector.active{
-    fill:rgba(255,140,77,0.32) !important;
-    stroke:rgba(255,140,77,0.9) !important;
-  }
+  /* Colors are applied per-camera via Leaflet's polygon style
+     options (see buildMap() in the script below), not CSS. */
+  .leaflet-interactive{ cursor:pointer; }
 
   /* ---------- IMAGE PANEL ---------- */
   .panel-backdrop{
@@ -462,7 +454,7 @@
     attributionControl: true,
     minZoom: 6,
     maxZoom: 18
-  }).setView([72.727, -77.75], 10);
+  }).setView([72.85, -77.75], 10);
 
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics',
@@ -497,6 +489,7 @@
           time: 'Latest image — 12 min ago',
           image: 'https://images.unsplash.com/photo-1517783999520-f068d7431a60?q=80&w=1200&auto=format&fit=crop',
           link: 'https://www.timelapse.gallery/g/tuvaq',
+          color: '#a78bfa', // purple
           fov: { direction: 315, width: 90, length: 6000 }   // length in metres, covers W (270°) to N (360°)
         },
         {
@@ -505,6 +498,7 @@
           time: 'Latest image — 12 min ago',
           image: 'https://images.unsplash.com/photo-1517783999520-f068d7431a60?q=80&w=1200&auto=format&fit=crop',
           link: 'https://www.timelapse.gallery/g/tuvaq',
+          color: '#fbbf24', // yellow
           fov: { direction: 45, width: 90, length: 6000 }    // covers N (0°) to E (90°)
         }
       ]
@@ -520,7 +514,8 @@
           name: 'Mittimatalik Beach',
           time: 'Latest image — 12 min ago',
           image: 'https://images.unsplash.com/photo-1517783999520-f068d7431a60?q=80&w=1200&auto=format&fit=crop',
-          link: 'https://www.timelapse.gallery/g/tuvaq'
+          link: 'https://www.timelapse.gallery/g/tuvaq',
+          color: '#f87171' // red
         }
       ]
     }
@@ -529,15 +524,16 @@
   // ============================================================
   // CUSTOM MARKER / LABEL ICONS
   // ============================================================
-  function camIcon(quiet){
+  function camIcon(quiet, color){
+    const c = color || 'var(--signal)';
     return L.divIcon({
       className: '',
-      html: `<div class="cam-marker ${quiet ? 'quiet' : 'clickable'}">
+      html: `<div class="cam-marker ${quiet ? 'quiet' : 'clickable'}" style="--marker-color:${c};">
                <div class="ring"></div>
                <div class="core"></div>
              </div>`,
-      iconSize: [34, 34],
-      iconAnchor: [17, 17]
+      iconSize: [44, 44],
+      iconAnchor: [22, 22]
     });
   }
 
@@ -546,7 +542,7 @@
       className: '',
       html: `<div class="cam-label">${name}</div>`,
       iconSize: [0, 0],
-      iconAnchor: [-10, -8] // nudge label down/right of marker center
+      iconAnchor: [-14, -10] // nudge label down/right of marker center
     });
   }
 
@@ -587,15 +583,19 @@
   // ============================================================
   // BUILD MARKERS, LABELS, FOV SECTORS
   // ============================================================
-  const fovPolygons = []; // { id, polygon }
+  const fovPolygons = []; // { id, polygon, color }
 
   function buildMap(){
     sites.forEach(site => {
       const camsWithFov = site.cameras.filter(c => c.fov);
       const quiet = camsWithFov.length > 0;
 
-      // marker (orange dot)
-      const marker = L.marker([site.lat, site.lng], { icon: camIcon(quiet) }).addTo(map);
+      // marker color: single-camera sites use that camera's color;
+      // multi-camera sites (with FOV sectors) get a neutral marker
+      // since the colored sectors carry the per-camera identity
+      const markerColor = (!quiet && site.cameras[0]) ? site.cameras[0].color : null;
+
+      const marker = L.marker([site.lat, site.lng], { icon: camIcon(quiet, markerColor) }).addTo(map);
 
       // label
       L.marker([site.lat, site.lng], {
@@ -604,19 +604,24 @@
       }).addTo(map);
 
       if (camsWithFov.length > 0){
-        // each camera with a FOV gets a clickable rounded sector
+        // each camera with a FOV gets a clickable rounded sector,
+        // colored individually
         camsWithFov.forEach(cam => {
           const latlngs = fovSectorLatLngs(site, cam.fov);
+          const color = cam.color || '#ff8c4d';
           const poly = L.polygon(latlngs, {
-            className: 'fov-sector',
-            weight: 2
+            color: color,
+            weight: 2,
+            opacity: 0.7,
+            fillColor: color,
+            fillOpacity: 0.20
           }).addTo(map);
 
           poly.on('click', () => openPanel(site, cam));
           poly.on('mouseover', () => highlightFov(cam.id));
           poly.on('mouseout', () => highlightFov(null));
 
-          fovPolygons.push({ id: cam.id, polygon: poly });
+          fovPolygons.push({ id: cam.id, polygon: poly, color: color });
         });
       } else {
         // no FOV: marker itself is the click target
@@ -626,13 +631,11 @@
   }
 
   function highlightFov(camId){
-    fovPolygons.forEach(({id, polygon}) => {
-      const el = polygon.getElement();
-      if (!el) return;
+    fovPolygons.forEach(({id, polygon, color}) => {
       if (camId && id === camId){
-        el.classList.add('active');
+        polygon.setStyle({ fillOpacity: 0.38, opacity: 1, weight: 3 });
       } else {
-        el.classList.remove('active');
+        polygon.setStyle({ fillOpacity: 0.20, opacity: 0.7, weight: 2 });
       }
     });
   }
