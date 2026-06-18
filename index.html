@@ -96,19 +96,19 @@
     align-items:baseline;
     gap:8px;
   }
-  .wordmark .dot{
-    width:8px; height:8px;
-    border-radius:50%;
-    background:var(--aurora);
-    box-shadow:0 0 8px var(--aurora);
-    display:inline-block;
-    transform:translateY(-2px);
-  }
   .wordmark small{
     font-family:var(--font-body);
     font-weight:400;
     font-size:11px;
     letter-spacing:0.08em;
+    color:var(--ice);
+    text-transform:uppercase;
+  }
+  .wordmark-place{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.1em;
     color:var(--ice);
     text-transform:uppercase;
   }
@@ -163,12 +163,8 @@
     font-weight:700;
     letter-spacing:0.03em;
     color:var(--ice);
-    background:rgba(6,20,31,0.78);
-    padding:5px 12px;
-    border-radius:6px;
-    border:1px solid rgba(231,241,240,0.1);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6);
     pointer-events:none;
-    backdrop-filter:blur(4px);
   }
 
   /* ---------- FOV SECTOR ---------- */
@@ -412,13 +408,10 @@
 <header>
   <div class="wordmark">
     <div class="wordmark-top">
-      <span class="dot"></span>
       TUVAQ
     </div>
+    <div class="wordmark-place">Mittimatalik</div>
     <small>Community sea ice monitoring</small>
-  </div>
-  <div class="header-sub">
-    <div id="live-count">MITTIMATALIK</div>
   </div>
 </header>
 
