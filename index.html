@@ -270,6 +270,7 @@
   .panel-image-wrap img{
     width:100%;
     height:auto;
+    min-height:200px;
     max-height:55vh;
     object-fit:cover;
     border-radius:10px;
@@ -486,7 +487,7 @@
 
   <!-- Image view -->
   <div class="panel-image-wrap" id="panel-image-wrap">
-    <img id="panel-image" src="https://images.unsplash.com/photo-1517783999520-f068d7431a60?q=80&w=1200&auto=format&fit=crop" alt="Latest image from the Igarjuaq camera">
+    <img id="panel-image" src="" alt="Latest image from the selected camera">
   </div>
   <div class="panel-footer" id="panel-footer">
     <span id="panel-back" style="display:none; cursor:pointer; color:var(--aurora); font-weight:600;">← Change camera</span>
@@ -771,6 +772,7 @@
 
     panelTitle.textContent = cam.name;
     panelTime.textContent = cam.time;
+    panelImage.src = '';
     panelImage.src = cam.image;
     panelImage.alt = `Latest image from the ${cam.name} camera`;
     panelLink.href = cam.link;
