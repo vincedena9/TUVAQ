@@ -276,7 +276,53 @@
     border:1px solid rgba(231,241,240,0.08);
     background:var(--slate);
     display:block;
+    cursor:zoom-in;
+    transition:opacity 0.15s ease;
   }
+  .panel-image-wrap img:hover{ opacity:0.92; }
+
+  /* ---------- LIGHTBOX ---------- */
+  .lightbox{
+    position:fixed;
+    inset:0;
+    z-index:3000;
+    background:rgba(6,20,31,0.92);
+    backdrop-filter:blur(8px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease;
+  }
+  .lightbox.open{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .lightbox img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    border-radius:8px;
+    box-shadow:0 8px 60px rgba(0,0,0,0.6);
+    cursor:zoom-out;
+  }
+  .lightbox-close{
+    position:absolute;
+    top:18px; right:18px;
+    width:40px; height:40px;
+    border-radius:50%;
+    background:rgba(11,34,48,0.85);
+    border:1px solid rgba(231,241,240,0.15);
+    color:var(--ice);
+    font-size:18px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    backdrop-filter:blur(6px);
+    transition:background 0.15s ease;
+  }
+  .lightbox-close:hover{ background:var(--slate); }
 
   .panel-footer{
     display:flex;
@@ -447,6 +493,12 @@
     <span id="panel-source">TUVAQ · Camera network</span>
     <a href="#" id="panel-link">Full gallery →</a>
   </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-close" id="lightbox-close">✕</div>
+  <img id="lightbox-image" src="" alt="">
 </div>
 
 <script>
@@ -744,6 +796,29 @@
 
   document.getElementById('panel-close').addEventListener('click', closePanel);
   backdrop.addEventListener('click', closePanel);
+
+  // ============================================================
+  // LIGHTBOX (tap image to view full-screen)
+  // ============================================================
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImage = document.getElementById('lightbox-image');
+
+  panelImage.addEventListener('click', () => {
+    lightboxImage.src = panelImage.src;
+    lightboxImage.alt = panelImage.alt;
+    lightbox.classList.add('open');
+  });
+
+  function closeLightbox(){
+    lightbox.classList.remove('open');
+  }
+
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    // close when clicking the dark backdrop, not the image itself
+    if (e.target === lightbox) closeLightbox();
+  });
+  lightboxImage.addEventListener('click', closeLightbox);
 
   // ============================================================
   // LIVE CAMERA COUNT
