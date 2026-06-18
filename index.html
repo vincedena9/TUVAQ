@@ -114,11 +114,8 @@
     text-align:right;
     line-height:1.5;
     pointer-events:auto;
-  }
-  .header-sub .live{
-    color:var(--aurora);
     font-weight:600;
-    letter-spacing:0.06em;
+    letter-spacing:0.08em;
   }
 
   /* ---------- SITE MARKER ---------- */
@@ -362,7 +359,7 @@
     column-gap:8px;
   }
   .intro-card strong{
-    color:var(--ice);
+    color:var(--aurora);
     font-family:var(--font-display);
     font-size:13px;
     letter-spacing:0.03em;
@@ -411,17 +408,16 @@
   <div class="wordmark">
     <span class="dot"></span>
     TUVAQ
-    <small>Mittimatalik · Tasiujaq</small>
+    <small>Community sea ice monitoring</small>
   </div>
   <div class="header-sub">
-    <div class="live" id="live-count">● — cameras active</div>
-    <div>Community sea ice monitoring</div>
+    <div id="live-count">MITTIMATALIK ( TASIUJAQ )</div>
   </div>
 </header>
 
 <div class="intro-card">
-  <strong>Monitoring cameras</strong>
-  Tap an orange marker or shaded sector on the map to see the latest image from that camera.
+  <strong id="cam-count-label">— cameras active</strong>
+  Tap a marker or shaded sector on the map to see the latest image from that camera.
 </div>
 
 <!-- IMAGE PANEL -->
@@ -609,10 +605,10 @@
       const camsWithFov = site.cameras.filter(c => c.fov);
       const quiet = camsWithFov.length > 0;
 
-      // marker color: single-camera sites use that camera's color;
-      // multi-camera sites (with FOV sectors) get a neutral marker
-      // since the colored sectors carry the per-camera identity
-      const markerColor = (!quiet && site.cameras[0]) ? site.cameras[0].color : null;
+      // marker color: all site markers share the same red dot
+      // (per-camera identity is carried by the colored FOV
+      // sectors for multi-camera sites like Igarjuaq)
+      const markerColor = '#f87171';
 
       const marker = L.marker([site.lat, site.lng], { icon: camIcon(quiet, markerColor) }).addTo(map);
 
@@ -755,7 +751,7 @@
   function updateLiveCount(){
     const total = sites.reduce((sum, site) => sum + site.cameras.length, 0);
     const label = total === 1 ? 'camera active' : 'cameras active';
-    document.getElementById('live-count').textContent = `● ${total} ${label}`;
+    document.getElementById('cam-count-label').textContent = `${total} ${label}`;
   }
 
   // ============================================================
