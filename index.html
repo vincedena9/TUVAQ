@@ -87,9 +87,14 @@
     letter-spacing:0.12em;
     color:var(--ice);
     display:flex;
+    flex-direction:column;
+    gap:4px;
+    pointer-events:auto;
+  }
+  .wordmark-top{
+    display:flex;
     align-items:baseline;
     gap:8px;
-    pointer-events:auto;
   }
   .wordmark .dot{
     width:8px; height:8px;
@@ -104,13 +109,13 @@
     font-weight:400;
     font-size:11px;
     letter-spacing:0.08em;
-    color:var(--ice-dim);
+    color:var(--ice);
     text-transform:uppercase;
   }
 
   .header-sub{
     font-size:12px;
-    color:var(--ice-dim);
+    color:var(--ice);
     text-align:right;
     line-height:1.5;
     pointer-events:auto;
@@ -406,12 +411,14 @@
 
 <header>
   <div class="wordmark">
-    <span class="dot"></span>
-    TUVAQ
+    <div class="wordmark-top">
+      <span class="dot"></span>
+      TUVAQ
+    </div>
     <small>Community sea ice monitoring</small>
   </div>
   <div class="header-sub">
-    <div id="live-count">MITTIMATALIK ( TASIUJAQ )</div>
+    <div id="live-count">MITTIMATALIK</div>
   </div>
 </header>
 
