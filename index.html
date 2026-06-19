@@ -826,22 +826,18 @@
       lng: -77.5285,
       cameras: [
         {
-          id: 'igarjuaq-west',
-          name: 'Igarjuaq — West',
+          id: 'igarjuaq-panorama',
+          name: 'Igarjuaq — Panorama',
           time: 'Latest image',
-          image: 'https://www.zeitdice.com/api/v4/sources/1BBCB9F4AB97C3521/stills/latest?key=b529d0ef806a38097b66',
           link: 'https://www.timelapse.gallery/g/tuvaq',
-          color: '#a78bfa', // purple
-          fov: { direction: 315, width: 90, length: 6000 }   // length in metres, covers W (270°) to N (360°)
-        },
-        {
-          id: 'igarjuaq-east',
-          name: 'Igarjuaq — East',
-          time: 'Latest image',
-          image: 'https://www.zeitdice.com/api/v4/sources/1BBCB9F4AB97C3520/stills/latest?key=5b982652bb8a18b71ae4',
-          link: 'https://www.timelapse.gallery/g/tuvaq',
-          color: '#fbbf24', // yellow
-          fov: { direction: 45, width: 90, length: 6000 }    // covers N (0°) to E (90°)
+          color: '#f87171',
+          merged: {
+            imageWest: 'https://www.zeitdice.com/api/v4/sources/1BBCB9F4AB97C3521/stills/latest?key=b529d0ef806a38097b66',
+            imageEast: 'https://www.zeitdice.com/api/v4/sources/1BBCB9F4AB97C3520/stills/latest?key=5b982652bb8a18b71ae4',
+            overlapPx: 266,
+            rotationDeg: -3.8,
+            verticalOffset: 365
+          }
         }
       ]
     },
@@ -1046,21 +1042,101 @@
 
     panelTitle.textContent = cam.name;
     panelTime.textContent = cam.time;
-    panelImage.src = '';
-    panelImage.src = cam.image;
-    panelImage.alt = `Latest image from the ${cam.name} camera`;
     panelLink.href = cam.link;
-
+    panelBack.style.display = 'none';
     highlightFov(cam.id);
 
-    if (site.cameras.length > 1){
-      panelBack.style.display = 'inline';
-      panelBack.onclick = () => {
-        panelTitle.textContent = site.name;
-        showChooser(site);
-      };
+    if (cam.merged){
+      // show loading state
+      panelImage.src = '';
+      panelImage.style.display = 'none';
+      panelTime.textContent = 'Loading panorama…';
+
+      // ensure canvas exists in the wrap
+      let canvas = document.getElementById('stitch-canvas');
+      if (!canvas){
+        canvas = document.createElement('canvas');
+        canvas.id = 'stitch-canvas';
+        canvas.style.cssText = 'width:100%; border-radius:10px; display:block; cursor:zoom-in;';
+        canvas.addEventListener('click', () => {
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+          lightboxImage.src = dataUrl;
+          lightboxImage.alt = cam.name;
+          lightbox.classList.add('open');
+        });
+        panelImageWrap.appendChild(canvas);
+      }
+      canvas.style.display = 'block';
+
+      const m = cam.merged;
+
+      function loadImg(url){
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = url;
+        });
+      }
+
+      Promise.all([loadImg(m.imageWest), loadImg(m.imageEast)])
+        .then(([imgW, imgE]) => {
+          // match heights (use min height)
+          const h = Math.min(imgW.naturalHeight, imgE.naturalHeight);
+          const wW = Math.round(imgW.naturalWidth * h / imgW.naturalHeight);
+          const wE = Math.round(imgE.naturalWidth * h / imgE.naturalHeight);
+
+          const overlap = m.overlapPx;
+          const vertOff = m.verticalOffset;
+          const rotRad = m.rotationDeg * Math.PI / 180;
+
+          // rotated east image bounding box
+          const cosA = Math.abs(Math.cos(rotRad));
+          const sinA = Math.abs(Math.sin(rotRad));
+          const rW = Math.ceil(wE * cosA + h * sinA);
+          const rH = Math.ceil(wE * sinA + h * cosA);
+
+          const totalW = wW + rW - overlap;
+          const totalH = Math.max(h, rH + vertOff) + 40;
+
+          canvas.width  = totalW;
+          canvas.height = totalH;
+
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, totalW, totalH);
+
+          // draw west image
+          const vertCenter = (totalH - h) / 2;
+          ctx.drawImage(imgW, 0, vertCenter, wW, h);
+
+          // draw east image rotated
+          ctx.save();
+          const eastX = wW - overlap + rW / 2;
+          const eastY = vertCenter - vertOff + rH / 2;
+          ctx.translate(eastX, eastY);
+          ctx.rotate(rotRad);
+          ctx.drawImage(imgE, -wE/2, -h/2, wE, h);
+          ctx.restore();
+
+          panelTime.textContent = cam.time;
+        })
+        .catch(() => {
+          // CORS blocked — fall back to showing images side by side as regular <img>
+          canvas.style.display = 'none';
+          panelImage.style.display = 'block';
+          panelImage.src = m.imageWest;
+          panelTime.textContent = 'West view (panorama unavailable)';
+        });
+
     } else {
-      panelBack.style.display = 'none';
+      // regular single image
+      let canvas = document.getElementById('stitch-canvas');
+      if (canvas) canvas.style.display = 'none';
+      panelImage.style.display = 'block';
+      panelImage.src = '';
+      panelImage.src = cam.image;
+      panelImage.alt = `Latest image from the ${cam.name} camera`;
     }
   }
 
