@@ -589,6 +589,47 @@
   }
   .about-cameras-credit a:hover{ color:var(--ice); }
 
+  .about-archive-link{
+    text-decoration:none;
+    display:block;
+  }
+  .about-archive-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 16px;
+    background:rgba(82,227,164,0.06);
+    border:1px solid rgba(82,227,164,0.2);
+    border-radius:10px;
+    transition:background 0.15s ease, border-color 0.15s ease;
+  }
+  .about-archive-card:hover{
+    background:rgba(82,227,164,0.12);
+    border-color:rgba(82,227,164,0.4);
+  }
+  .about-archive-icon{
+    font-size:20px;
+    color:var(--aurora);
+    flex-shrink:0;
+  }
+  .about-archive-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ice);
+    margin-bottom:3px;
+  }
+  .about-archive-sub{
+    font-size:11px;
+    color:var(--ice-dim);
+    line-height:1.4;
+  }
+  .about-archive-arrow{
+    margin-left:auto;
+    color:var(--aurora);
+    font-size:16px;
+    flex-shrink:0;
+  }
+
   /* ---------- LEGEND / INTRO CARD ---------- */
   .intro-card{
     position:absolute;
@@ -711,7 +752,7 @@
     <p><strong>Tuvaq</strong>, landfast ice, is essential for Mittimatalingmiut (people of Mittimatalik), who travel on it for about seven months a year to hunt, fish, and connect with the land. But this ice is changing: forming later, breaking sooner, and becoming harder to predict.</p>
     <p>Solar-powered cameras on Igarjuaq (Mount Herodier) and in Mittimatalik provide real-time images overlooking key travel routes across Tasiujaq and Tursukattak from early spring to late summer, helping local residents choose safer routes and plan trips to the floe edge.</p>
     <p>The first camera system was deployed in 2015 following community concerns about vessel traffic breaking through winter ice. Hunters and travellers quickly found the images useful. We relaunched the project in 2025 with improved equipment and closer community involvement.</p>
-    <p>Beyond community use, the camera data helps scientists study how landfast ice forms, moves and breaks up, improving the sea ice models used in Arctic forecasting.</p>
+    <p>Beyond community use, the camera data help scientists study how landfast ice forms, moves and breaks up, and improve Arctic sea ice forecasting systems.</p>
     <p>The project runs from 2025 to 2030, in collaboration with Oceans North Canada and with the support of the Mittimatalik Hunters and Trappers Organization (MHTO). Findings are shared openly with the community, and we welcome anyone from Mittimatalik, especially youth and students, who wants to get involved.</p>
 
     <div class="about-partners">
@@ -733,6 +774,20 @@
     </div>
 
     <div class="about-partners" style="margin-top:10px;">
+      <div class="about-partners-title">Past Images</div>
+      <a href="https://vimeo.com/showcase/12282225" target="_blank" class="about-archive-link">
+        <div class="about-archive-card">
+          <div class="about-archive-icon">▶</div>
+          <div>
+            <div class="about-archive-title">Image archive 2015–2024</div>
+            <div class="about-archive-sub">Browse timelapse videos from previous seasons on Vimeo</div>
+          </div>
+          <div class="about-archive-arrow">→</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="about-partners" style="margin-top:10px;">
       <div class="about-partners-title">Contact</div>
       <div class="about-contacts">
         <div class="about-contact-item">
@@ -744,7 +799,7 @@
           <a href="mailto:aootoowak@oceansnorth.ca">aootoowak@oceansnorth.ca</a>
         </div>
         <div class="about-contact-item">
-          <span class="contact-name">Ben Savard</span>
+          <span class="contact-name">Benoît Savard</span>
           <a href="mailto:bsavard@oceansnorth.ca">bsavard@oceansnorth.ca</a>
         </div>
       </div>
